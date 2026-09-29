@@ -1,17 +1,17 @@
-// Enregistrement du Service Worker pour le mode PWA / Offline
+// Enregistrement du Service Worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("Service Worker enregistré avec succès."))
-    .catch((err) => console.log("Erreur Service Worker :", err));
+    .then(() => console.log("Service Worker enregistré."))
+    .catch((err) => console.log("Erreur SW :", err));
 }
 
-// Horloge en direct dans la barre des tâches
+// Horloge en direct
 setInterval(() => {
     const now = new Date();
     document.getElementById('clock').innerText = now.toLocaleTimeString();
 }, 1000);
 
-// Gestion de l'ouverture et de la fermeture des fenêtres
+// Gestion des fenêtres
 function openWindow(id) {
     document.getElementById(id).classList.add('active');
 }
@@ -21,35 +21,75 @@ function closeWindow(id) {
 }
 
 function toggleStartMenu() {
-    alert("Menu Démarrer - Dev.Assamoi OS\nUtilisez les icônes du bureau pour lancer CMD, Word ou le Dossier d'Aide.");
+    alert("Menu Démarrer - Dev.Assamoi OS\nPoste de travail mobile actif.");
 }
 
-// Interception globale des touches (Ctrl+P, Touches de Fonction F1-F12)
-window.addEventListener('keydown', function(e) {
-    // Gestion de Ctrl + P pour l'impression globale
-    if (e.ctrlKey && e.key.toLowerCase() === 'p') {
-        e.preventDefault();
-        window.print();
-    }
+// --- SIMULATION DE L'EXPLORATEUR DE FICHIERS / DOSSIERS ---
+let userFolders = ['Documents', 'Chantier Carena', 'Scripts JS', 'Projets Web'];
 
-    // Gestion des touches de fonction (F1 à F12)
-    if (e.key.startsWith('F')) {
-        if (e.key === 'F2') {
-            e.preventDefault();
-            alert("Touche F2 interceptée : Mode d'édition rapide.");
-        }
-        if (e.key === 'F3') {
-            e.preventDefault();
-            openWindow('win-help'); // Ouvre le dossier d'aide avec F3
-        }
-        if (e.key === 'F5') {
-            e.preventDefault();
-            location.reload(); // Actualise l'application
-        }
+function renderFolders() {
+    const container = document.getElementById('folders-container');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    userFolders.forEach((folder, index) => {
+        container.innerHTML += `
+            <div class="icon" onclick="openFolderContent('${folder}')">
+                <span>📁</span>
+                <p>${folder}</p>
+            </div>
+        `;
+    });
+}
+
+function createNewFolder() {
+    const folderName = prompt("Nom du nouveau dossier :");
+    if (folderName && folderName.trim() !== '') {
+        userFolders.push(folderName.trim());
+        renderFolders();
     }
+}
+
+function openFolderContent(folderName) {
+    alert(`Ouverture du dossier : ${folderName}\n(Ici s'afficheront vos fichiers locaux).`);
+}
+
+// Initialisation des dossiers au chargement
+window.addEventListener('DOMContentLoaded', () => {
+    renderFolders();
 });
 
-// Logique de l'invite de commandes (CMD)
+// --- CLAVIER VIRTUEL PC POUR MOBILE ---
+function toggleVirtualKeyboard() {
+    const kb = document.getElementById('virtual-keyboard');
+    if (kb.style.display === 'flex') {
+        kb.style.display = 'none';
+    } else {
+        kb.style.display = 'flex';
+    }
+}
+
+// Simulation de touches spéciales pour le champ actif
+function sendKey(keyName) {
+    const activeEl = document.activeElement;
+    if (!activeEl) return;
+
+    if (keyName === 'TAB') {
+        activeEl.value += '\t';
+    } else if (keyName === 'ENTER') {
+        if (activeEl.id === 'cmd-input') {
+            handleCmd({ key: 'Enter' });
+        } else {
+            activeEl.value += '\n';
+        }
+    } else if (keyName === 'BACKSPACE') {
+        activeEl.value = activeEl.value.slice(0, -1);
+    } else {
+        activeEl.value += keyName;
+    }
+}
+
+// Logique CMD
 function handleCmd(e) {
     if (e.key === 'Enter') {
         const input = document.getElementById('cmd-input');
@@ -59,36 +99,21 @@ function handleCmd(e) {
         output.innerHTML += `C:\\Users\\Admin> ${val}<br>`;
 
         if (val.toLowerCase() === 'help') {
-            output.innerHTML += `Commandes disponibles :<br> - <b>cls</b> : Effacer l'écran<br> - <b>date</b> : Afficher la date<br> - <b>ver</b> : Version du système<br> - <b>excel</b> : Ouvrir l'aide Excel<br><br>`;
+            output.innerHTML += `Commandes : cls, date, ver, mkdir [dossier]<br><br>`;
         } else if (val.toLowerCase() === 'cls') {
             output.innerHTML = '';
         } else if (val.toLowerCase() === 'date') {
             output.innerHTML += `${new Date().toLocaleString()}<br><br>`;
-        } else if (val.toLowerCase() === 'ver') {
-            output.innerHTML += `Dev.Assamoi WebOS v1.0 (Build 2026)<br><br>`;
-        } else if (val.toLowerCase() === 'excel') {
-            openWindow('win-help');
-            output.innerHTML += `Ouverture du dossier d'aide Excel...<br><br>`;
+        } else if (val.startsWith('mkdir ')) {
+            const newF = val.replace('mkdir ', '').trim();
+            userFolders.push(newF);
+            renderFolders();
+            output.innerHTML += `Dossier '${newF}' créé avec succès sur le bureau.<br><br>`;
         } else if (val !== '') {
-            output.innerHTML += `'${val}' n'est pas reconnu en tant qu'commande interne.<br><br>`;
+            output.innerHTML += `'${val}' non reconnu.<br><br>`;
         }
 
         input.value = '';
         output.scrollTop = output.scrollHeight;
     }
-}
-
-// Recherche dynamique dans le dossier d'aide / codes
-function filterCheatSheet() {
-    const query = document.getElementById('searchCheat').value.toLowerCase();
-    const sections = document.querySelectorAll('.cheat-sheet-section');
-
-    sections.forEach(sec => {
-        const text = sec.innerText.toLowerCase();
-        if (text.includes(query)) {
-            sec.style.display = 'block';
-        } else {
-            sec.style.display = 'none';
-        }
-    });
 }
