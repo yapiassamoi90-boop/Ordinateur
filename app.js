@@ -52,10 +52,21 @@ function filterStartMenu(e) {
 // Options d'alimentation
 function systemAction(action) {
     if (action === 'shutdown') {
-        document.getElementById('shutdown-screen').style.display = 'flex';
+        const screen = document.getElementById('shutdown-screen');
+        if (screen) {
+            screen.style.display = 'flex';
+        }
         closeStartMenu();
     } else if (action === 'restart') {
         location.reload();
+    }
+}
+
+// Allumer le PC depuis l'écran d'extinction
+function turnOnPC() {
+    const screen = document.getElementById('shutdown-screen');
+    if (screen) {
+        screen.style.display = 'none';
     }
 }
 
