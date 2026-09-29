@@ -10,7 +10,7 @@
 </head>
 <body>
 
-    <!-- Bureau avec Icônes -->
+    <!-- Bureau avec Icônes et Dossiers Dynamiques -->
     <div id="desktop">
         <div class="icon" onclick="openWindow('win-cmd')">
             <span>💻</span>
@@ -23,6 +23,27 @@
         <div class="icon" onclick="openWindow('win-help')">
             <span>📁</span>
             <p>Aide & Codes</p>
+        </div>
+        <div class="icon" onclick="openWindow('win-explorer')">
+            <span>🗂️</span>
+            <p>Poste de travail</p>
+        </div>
+
+        <!-- Conteneur où s'afficheront tes dossiers personnalisés -->
+        <div id="folders-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; padding: 10px; width: 100%;"></div>
+    </div>
+
+    <!-- Fenêtre Poste de travail / Explorateur de dossiers -->
+    <div id="win-explorer" class="window">
+        <div class="window-header">
+            <span class="window-title">Poste de travail - Gestion des dossiers</span>
+            <div class="window-controls"><button onclick="closeWindow('win-explorer')">×</button></div>
+        </div>
+        <div class="window-body">
+            <div style="margin-bottom: 15px;">
+                <button onclick="createNewFolder()" style="padding: 6px 12px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer;">+ Créer un dossier</button>
+            </div>
+            <p style="color: #ccc; font-size: 14px;">Gérez vos répertoires de travail directement depuis votre interface mobile.</p>
         </div>
     </div>
 
@@ -139,9 +160,20 @@
         </div>
     </div>
 
+    <!-- Barre de touches virtuelles PC (Pour le tactile du téléphone) -->
+    <div id="virtual-keyboard" style="display: none; position: fixed; bottom: 40px; left: 0; width: 100%; background: #222; padding: 6px; justify-content: center; gap: 6px; z-index: 9999; border-top: 1px solid #444;">
+        <button onclick="sendKey('Ctrl')" style="background: #444; color: #fff; border: none; padding: 6px 10px; border-radius: 3px;">Ctrl</button>
+        <button onclick="sendKey('Alt')" style="background: #444; color: #fff; border: none; padding: 6px 10px; border-radius: 3px;">Alt</button>
+        <button onclick="sendKey('TAB')" style="background: #444; color: #fff; border: none; padding: 6px 10px; border-radius: 3px;">Tab</button>
+        <button onclick="sendKey('/')" style="background: #444; color: #fff; border: none; padding: 6px 10px; border-radius: 3px;">/</button>
+        <button onclick="sendKey('\\')" style="background: #444; color: #fff; border: none; padding: 6px 10px; border-radius: 3px;">\</button>
+        <button onclick="sendKey('BACKSPACE')" style="background: #a94442; color: #fff; border: none; padding: 6px 10px; border-radius: 3px;">⌫ Effacer</button>
+    </div>
+
     <!-- Barre des Tâches -->
     <div id="taskbar">
         <button class="start-btn" onclick="toggleStartMenu()">🏁 Menu</button>
+        <button onclick="toggleVirtualKeyboard()" style="background: #333; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">⌨️ Clavier PC</button>
         <div id="clock">00:00:00</div>
     </div>
 
