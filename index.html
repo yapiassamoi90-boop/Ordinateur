@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebOS Desktop - Dev.Assamoi</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Lien pour le Manifest PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111115">
+</head>
+<body>
+
+    <!-- Bureau avec Icônes -->
+    <div id="desktop">
+        <div class="icon" onclick="openWindow('win-cmd')">
+            <span>💻</span>
+            <p>CMD.exe</p>
+        </div>
+        <div class="icon" onclick="openWindow('win-word')">
+            <span>📝</span>
+            <p>WordPad</p>
+        </div>
+        <div class="icon" onclick="openWindow('win-help')">
+            <span>📁</span>
+            <p>Aide & Codes</p>
+        </div>
+    </div>
+
+    <!-- Fenêtre CMD -->
+    <div id="win-cmd" class="window">
+        <div class="window-header">
+            <span class="window-title">Invite de commandes (CMD)</span>
+            <div class="window-controls"><button onclick="closeWindow('win-cmd')">×</button></div>
+        </div>
+        <div class="window-body" style="padding: 0; display: flex; flex-direction: column;">
+            <div id="cmd-output">Microsoft Windows [Version 10.0.26200]<br>(c) Dev.Assamoi Corp. Tous droits réservés.<br><br>Tapez 'help' pour voir les commandes disponibles.<br><br></div>
+            <div class="cmd-input-line">
+                <span>C:\Users\Admin></span>
+                <input type="text" id="cmd-input" autofocus onkeydown="handleCmd(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre WordPad / Traitement de texte -->
+    <div id="win-word" class="window">
+        <div class="window-header">
+            <span class="window-title">Traitement de texte - WordPad</span>
+            <div class="window-controls"><button onclick="closeWindow('win-word')">×</button></div>
+        </div>
+        <div class="window-body">
+            <div style="margin-bottom: 10px;">
+                <button onclick="document.execCommand('bold', false, null)" style="padding: 4px 8px;">Gras</button>
+                <button onclick="document.execCommand('italic', false, null)" style="padding: 4px 8px;">Italique</button>
+                <button onclick="window.print()" style="padding: 4px 8px; background: #007acc; color: white; border: none; border-radius: 3px;">Imprimer (Ctrl+P)</button>
+            </div>
+            <div contenteditable="true" style="width: 100%; height: calc(100% - 45px); background: #fff; color: #000; padding: 10px; border-radius: 4px; outline: none;" placeholder="Commencez à saisir votre texte ici..."></div>
+        </div>
+    </div>
+
+    <!-- Fenêtre Aide, Codes et Raccourcis Ultime -->
+    <div id="win-help" class="window">
+        <div class="window-header">
+            <span class="window-title">📁 Dossier Pense-Bête Ultime - Codes, Captures & Raccourcis</span>
+            <div class="window-controls"><button onclick="closeWindow('win-help')">×</button></div>
+        </div>
+        <div class="window-body">
+            <input type="text" class="search-box" id="searchCheat" placeholder="🔍 Recherche rapide (ex: capture, excel, addition, F3, copier)..." onkeyup="filterCheatSheet()">
+            
+            <div id="cheat-content">
+                <!-- Section Captures d'écran & Fenêtres -->
+                <div class="cheat-sheet-section" data-category="captures">
+                    <h3>📸 Captures d'écran & Gestion des Fenêtres</h3>
+                    <table class="cheat-table">
+                        <tr><th>Raccourci</th><th>Action / Utilisation</th></tr>
+                        <tr><td><code>Win + Shift + S</code></td><td>Ouvrir l'outil Capture d'écran (Copier une zone précise).</td></tr>
+                        <tr><td><code>Touche Impr. Écran</code></td><td>Capturer tout l'écran instantanément.</td></tr>
+                        <tr><td><code>Alt + Tab</code></td><td>Basculer rapidement entre les applications ouvertes.</td></tr>
+                        <tr><td><code>Win + D</code></td><td>Afficher / Masquer instantanément le Bureau.</td></tr>
+                        <tr><td><code>Win + Flèche Gauche / Droite</code></td><td>Ancrer (splitter) la fenêtre active sur un côté.</td></tr>
+                    </table>
+                </div>
+
+                <!-- Section Saisie & Navigation -->
+                <div class="cheat-sheet-section" data-category="saisie">
+                    <h3>⌨️ Saisie de texte & Raccourcis Rapides</h3>
+                    <table class="cheat-table">
+                        <tr><th>Raccourci</th><th>Action / Utilisation</th></tr>
+                        <tr><td><code>Ctrl + C</code> / <code>Ctrl + V</code></td><td>Copier / Coller le texte sélectionné.</td></tr>
+                        <tr><td><code>Ctrl + X</code></td><td>Couper le texte sélectionné.</td></tr>
+                        <tr><td><code>Ctrl + A</code></td><td>Tout sélectionner.</td></tr>
+                        <tr><td><code>Ctrl + Z</code> / <code>Ctrl + Y</code></td><td>Annuler / Rétablir la dernière action.</td></tr>
+                        <tr><td><code>Ctrl + F</code></td><td>Rechercher un mot ou un code dans la page.</td></tr>
+                        <tr><td><code>Ctrl + P</code></td><td>Imprimer le document actif.</td></tr>
+                        <tr><td><code>Ctrl + W</code></td><td>Fermer l'onglet ou la fenêtre active.</td></tr>
+                    </table>
+                </div>
+
+                <!-- Section Excel -->
+                <div class="cheat-sheet-section" data-category="excel">
+                    <h3>📊 Formules Excel & Calculs de Chantier</h3>
+                    <table class="cheat-table">
+                        <tr><th>Opération / Action</th><th>Formule / Syntaxe Excel</th><th>Explication</th></tr>
+                        <tr><td>Addition</td><td><code>=A1 + B1</code> ou <code>=SOMME(A1:A10)</code></td><td>Additionne des cellules ou une plage.</td></tr>
+                        <tr><td>Soustraction</td><td><code>=A1 - B1</code></td><td>Soustrait B1 de A1.</td></tr>
+                        <tr><td>Multiplication</td><td><code>=A1 * B1</code></td><td>Multiplie les cellules.</td></tr>
+                        <tr><td>Division</td><td><code>=A1 / B1</code></td><td>Divise A1 par B1.</td></tr>
+                        <tr><td>Moyenne</td><td><code>=MOYENNE(A1:A10)</code></td><td>Calcule la moyenne d'une plage.</td></tr>
+                        <tr><td>Condition (Si)</td><td><code>=SI(A1>10; "OK"; "Erreur")</code></td><td>Vérifie une condition logique.</td></tr>
+                        <tr><td>Raccourci F2 (Excel)</td><td>Touche <code>F2</code></td><td>Modifier le contenu de la cellule active.</td></tr>
+                    </table>
+                </div>
+
+                <!-- Section Commandes Système & Terminal -->
+                <div class="cheat-sheet-section" data-category="terminal">
+                    <h3>💻 Commandes Terminal (CMD & Linux / Termux)</h3>
+                    <table class="cheat-table">
+                        <tr><th>Commande</th><th>Système</th><th>Rôle / Action</th></tr>
+                        <tr><td><code>cls</code> / <code>clear</code></td><td>CMD / Linux</td><td>Effacer l'écran du terminal.</td></tr>
+                        <tr><td><code>dir</code> / <code>ls</code></td><td>CMD / Linux</td><td>Lister les fichiers du dossier actuel.</td></tr>
+                        <tr><td><code>cd [dossier]</code></td><td>CMD / Linux</td><td>Changer de répertoire.</td></tr>
+                        <tr><td><code>ping [ip]</code></td><td>Réseau</td><td>Tester la connexion vers un équipement.</td></tr>
+                        <tr><td><code>ipconfig</code> / <code>ifconfig</code></td><td>Réseau</td><td>Afficher l'adresse IP et config réseau.</td></tr>
+                    </table>
+                </div>
+
+                <!-- Section Touches de Fonction -->
+                <div class="cheat-sheet-section" data-category="fonctions">
+                    <h3>⚙️ Touches de Fonction (F1 à F12)</h3>
+                    <table class="cheat-table">
+                        <tr><th>Touche</th><th>Action Principale</th></tr>
+                        <tr><td><code>F1</code></td><td>Ouvrir l'aide contextuelle.</td></tr>
+                        <tr><td><code>F2</code></td><td>Renommer un fichier ou éditer une cellule.</td></tr>
+                        <tr><td><code>F3</code></td><td>Ouvrir la recherche rapide.</td></tr>
+                        <tr><td><code>F5</code></td><td>Actualiser la page ou le dossier.</td></tr>
+                        <tr><td><code>F11</code></td><td>Activer / Désactiver le mode Plein Écran.</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barre des Tâches -->
+    <div id="taskbar">
+        <button class="start-btn" onclick="toggleStartMenu()">🏁 Menu</button>
+        <div id="clock">00:00:00</div>
+    </div>
+
+    <script>
+        // Enregistrement du Service Worker pour le mode PWA / Offline
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker enregistré avec succès."))
+            .catch((err) => console.log("Erreur Service Worker :", err));
+        }
+
+        // Horloge en direct
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }, 1000);
+
+        // Gestion des fenêtres
+        function openWindow(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeWindow(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        function toggleStartMenu() {
+            alert("Menu Démarrer - Dev.Assamoi OS\nUtilisez les icônes du bureau pour lancer CMD, Word ou le Dossier d'Aide.");
+        }
+
+        // Interception globale des touches (Ctrl+P, Touches de Fonction F1-F12)
+        window.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key.toLowerCase() === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+            if (e.key.startsWith('F')) {
+                if (e.key === 'F2') {
+                    e.preventDefault();
+                    alert("Touche F2 interceptée : Mode d'édition rapide.");
+                }
+                if (e.key === 'F3') {
+                    e.preventDefault();
+                    openWindow('win-help');
+                }
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    location.reload();
+                }
+            }
+        });
+
+        // Logique CMD
+        function handleCmd(e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('cmd-input');
+                const output = document.getElementById('cmd-output');
+                const val = input.value.trim();
+                
+                output.innerHTML += `C:\\Users\\Admin> ${val}<br>`;
+
+                if (val.toLowerCase() === 'help') {
+                    output.innerHTML += `Commandes disponibles :<br> - <b>cls</b> : Effacer l'écran<br> - <b>date</b> : Afficher la date<br> - <b>ver</b> : Version du système<br> - <b>excel</b> : Ouvrir l'aide Excel<br><br>`;
+                } else if (val.toLowerCase() === 'cls') {
+                    output.innerHTML = '';
+                } else if (val.toLowerCase() === 'date') {
+                    output.innerHTML += `${new Date().toLocaleString()}<br><br>`;
+                } else if (val.toLowerCase() === 'ver') {
+                    output.innerHTML += `Dev.Assamoi WebOS v1.0 (Build 2026)<br><br>`;
+                } else if (val.toLowerCase() === 'excel') {
+                    openWindow('win-help');
+                    output.innerHTML += `Ouverture du dossier d'aide Excel...<br><br>`;
+                } else if (val !== '') {
+                    output.innerHTML += `'${val}' n'est pas reconnu en tant qu'commande interne.<br><br>`;
+                }
+
+                input.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+
+        // Recherche dynamique
+        function filterCheatSheet() {
+            const query = document.getElementById('searchCheat').value.toLowerCase();
+            const sections = document.querySelectorAll('.cheat-sheet-section');
+
+            sections.forEach(sec => {
+                const text = sec.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    sec.style.display = 'block';
+                } else {
+                    sec.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
