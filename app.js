@@ -1,152 +1,221 @@
-// Enregistrement du Service Worker pour le mode PWA / Offline
+// Enregistrement du Service Worker
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("Service Worker enregistré avec succès."))
-    .catch((err) => console.log("Erreur Service Worker :", err));
+    navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
 }
 
-// Horloge en direct dans la barre des tâches
+// Horloge en direct
 setInterval(() => {
-    const now = new Date();
-    document.getElementById('clock').innerText = now.toLocaleTimeString();
+    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
 }, 1000);
 
-// Gestion de l'ouverture et de la fermeture des fenêtres
+// Gestion des fenêtres
 function openWindow(id) {
     document.getElementById(id).classList.add('active');
+    closeStartMenu();
+    if(id === 'win-explorer') renderExplorerFiles();
 }
 
 function closeWindow(id) {
     document.getElementById(id).classList.remove('active');
 }
 
+// Menu Démarrer
 function toggleStartMenu() {
-    alert("Menu Démarrer - Dev.Assamoi OS\nPoste de travail mobile actif.");
+    const menu = document.getElementById('start-menu');
+    if (menu.classList.contains('start-menu-hidden')) {
+        menu.classList.remove('start-menu-hidden');
+        document.getElementById('startSearchInput').focus();
+    } else {
+        closeStartMenu();
+    }
 }
 
-// --- GESTION DES DOSSIERS DU TÉLÉPHONE / BUREAU ---
-let userFolders = ['Documents', 'Chantier Carena', 'Scripts JS', 'Projets Web'];
+function closeStartMenu() {
+    document.getElementById('start-menu').classList.add('start-menu-hidden');
+}
+
+function launchFromStart(windowId) {
+    openWindow(windowId);
+}
+
+// Recherche dans le Menu Démarrer
+function filterStartMenu(e) {
+    const query = document.getElementById('startSearchInput').value.toLowerCase();
+    if (e.key === 'Enter') {
+        if (query.includes('cmd')) openWindow('win-cmd');
+        else if (query.includes('word')) openWindow('win-word');
+        else if (query.includes('navigateur') || query.includes('google')) openWindow('win-browser');
+        else if (query.includes('poste') || query.includes('dossier')) openWindow('win-explorer');
+    }
+}
+
+// Options d'alimentation
+function systemAction(action) {
+    if (action === 'shutdown') {
+        document.getElementById('shutdown-screen').style.display = 'flex';
+        closeStartMenu();
+    } else if (action === 'restart') {
+        location.reload();
+    }
+}
+
+// Gestion des dossiers et fichiers importés avec localStorage
+let userFolders = JSON.parse(localStorage.getItem('asamoi_folders')) || ['Documents', 'Chantier Carena', 'Projets Web'];
+let importedFiles = JSON.parse(localStorage.getItem('asamoi_files')) || [];
 
 function renderFolders() {
     const container = document.getElementById('folders-container');
     if (!container) return;
     container.innerHTML = '';
     
-    userFolders.forEach((folder) => {
+    // Affichage des dossiers
+    userFolders.forEach(folder => {
         container.innerHTML += `
-            <div class="icon" onclick="openFolderContent('${folder}')">
+            <div class="icon" onclick="alert('Ouverture du dossier : ${folder}')">
                 <span>📁</span>
                 <p>${folder}</p>
+            </div>
+        `;
+    });
+
+    // Affichage des fichiers importés directement sur le bureau
+    importedFiles.forEach((file, index) => {
+        container.innerHTML += `
+            <div class="icon" onclick="openImportedFile(${index})">
+                <span>📄</span>
+                <p style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 75px;">${file.name}</p>
             </div>
         `;
     });
 }
 
 function createNewFolder() {
-    const folderName = prompt("Nom du nouveau dossier :");
-    if (folderName && folderName.trim() !== '') {
-        userFolders.push(folderName.trim());
+    const name = prompt("Nom du nouveau dossier :");
+    if (name && name.trim()) {
+        userFolders.push(name.trim());
+        localStorage.setItem('asamoi_folders', JSON.stringify(userFolders));
         renderFolders();
     }
 }
 
-function openFolderContent(folderName) {
-    alert(`Ouverture du dossier : ${folderName}\n(Espace de stockage local prêt).`);
+// Importer un fichier depuis le téléphone dans l'OS
+function importFileToOS(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const fileData = {
+            name: file.name,
+            size: (file.size / 1024).toFixed(1) + ' Ko',
+            content: e.target.result
+        };
+        importedFiles.push(fileData);
+        localStorage.setItem('asamoi_files', JSON.stringify(importedFiles));
+        renderFolders();
+        renderExplorerFiles();
+        alert(`Fichier "${file.name}" importé avec succès dans votre PC virtuel !`);
+    };
+    reader.readAsDataURL(file);
 }
 
-// Charger les dossiers au démarrage
+function renderExplorerFiles() {
+    const list = document.getElementById('explorer-files-list');
+    if (!list) return;
+    if (importedFiles.length === 0) {
+        list.innerHTML = '<p style="color: #770; font-size: 13px;">Aucun fichier importé pour le moment.</p>';
+        return;
+    }
+    list.innerHTML = '<ul style="list-style: none; padding: 0;">';
+    importedFiles.forEach((file, index) => {
+        list.innerHTML += `
+            <li style="display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #eee; align-items: center;">
+                <span>📄 ${file.name} (${file.size})</span>
+                <div>
+                    <button onclick="openImportedFile(${index})" style="background: #0078d7; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; margin-right: 5px;">Ouvrir</button>
+                    <button onclick="deleteImportedFile(${index})" style="background: #d83b01; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer;">Supprimer</button>
+                </div>
+            </li>
+        `;
+    });
+    list.innerHTML += '</ul>';
+}
+
+function openImportedFile(index) {
+    const file = importedFiles[index];
+    if (file.content.startsWith('data:image')) {
+        let win = window.open();
+        win.document.write(`<img src="${file.content}" style="max-width:100%;"/>`);
+    } else {
+        alert(`Ouverture du fichier texte/donnée : ${file.name}`);
+    }
+}
+
+function deleteImportedFile(index) {
+    if (confirm("Voulez-vous supprimer ce fichier de votre PC ?")) {
+        importedFiles.splice(index, 1);
+        localStorage.setItem('asamoi_files', JSON.stringify(importedFiles));
+        renderFolders();
+        renderExplorerFiles();
+    }
+}
+
+function clearLocalStorage() {
+    if (confirm("Attention : Vider le stockage va supprimer tous vos dossiers personnalisés et fichiers importés. Continuer ?")) {
+        localStorage.clear();
+        userFolders = ['Documents', 'Chantier Carena', 'Projets Web'];
+        importedFiles = [];
+        renderFolders();
+        renderExplorerFiles();
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     renderFolders();
 });
 
-// --- CLAVIER VIRTUEL DE TYPE PC ---
+// Clavier virtuel PC
 function toggleVirtualKeyboard() {
     const kb = document.getElementById('virtual-keyboard');
-    if (kb.style.display === 'flex') {
-        kb.style.display = 'none';
-    } else {
-        kb.style.display = 'flex';
-    }
+    kb.style.display = kb.style.display === 'flex' ? 'none' : 'flex';
 }
 
 function sendKey(keyName) {
     const activeEl = document.activeElement;
     if (!activeEl) return;
-
-    if (keyName === 'TAB') {
-        activeEl.value += '\t';
-    } else if (keyName === 'BACKSPACE') {
-        activeEl.value = activeEl.value.slice(0, -1);
-    } else {
-        activeEl.value += keyName;
-    }
+    if (keyName === 'Tab') activeEl.value += '\t';
+    else if (keyName === 'BACKSPACE') activeEl.value = activeEl.value.slice(0, -1);
+    else activeEl.value += keyName;
 }
 
-// Interception globale des touches (Ctrl+P, Touches de Fonction F1-F12)
-window.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.key.toLowerCase() === 'p') {
-        e.preventDefault();
-        window.print();
-    }
-
-    if (e.key.startsWith('F')) {
-        if (e.key === 'F2') {
-            e.preventDefault();
-            alert("Touche F2 interceptée : Mode d'édition rapide.");
-        }
-        if (e.key === 'F3') {
-            e.preventDefault();
-            openWindow('win-help');
-        }
-        if (e.key === 'F5') {
-            e.preventDefault();
-            location.reload();
-        }
-    }
-});
-
-// Logique de l'invite de commandes (CMD)
+// CMD Logique
 function handleCmd(e) {
     if (e.key === 'Enter') {
         const input = document.getElementById('cmd-input');
         const output = document.getElementById('cmd-output');
-        const val = input.value.trim();
+        const val = input.value.trim().toLowerCase();
         
-        output.innerHTML += `C:\\Users\\Admin> ${val}<br>`;
+        output.innerHTML += `C:\\Users\\Admin> ${input.value}<br>`;
 
-        if (val.toLowerCase() === 'help') {
-            output.innerHTML += `Commandes disponibles :<br> - <b>cls</b> : Effacer l'écran<br> - <b>date</b> : Afficher la date<br> - <b>ver</b> : Version du système<br> - <b>mkdir [nom]</b> : Créer un dossier<br><br>`;
-        } else if (val.toLowerCase() === 'cls') {
+        if (val === 'help') {
+            output.innerHTML += `Commandes : cls, date, ver, shutdown<br><br>`;
+        } else if (val === 'cls') {
             output.innerHTML = '';
-        } else if (val.toLowerCase() === 'date') {
+        } else if (val === 'date') {
             output.innerHTML += `${new Date().toLocaleString()}<br><br>`;
-        } else if (val.toLowerCase() === 'ver') {
-            output.innerHTML += `Dev.Assamoi WebOS v1.0 (Build 2026)<br><br>`;
-        } else if (val.startsWith('mkdir ')) {
-            const newF = val.replace('mkdir ', '').trim();
-            userFolders.push(newF);
-            renderFolders();
-            output.innerHTML += `Dossier '${newF}' créé avec succès sur le bureau.<br><br>`;
+        } else if (val === 'shutdown') {
+            systemAction('shutdown');
         } else if (val !== '') {
-            output.innerHTML += `'${val}' n'est pas reconnu en tant que commande interne.<br><br>`;
+            output.innerHTML += `'${val}' non reconnu.<br><br>`;
         }
-
         input.value = '';
         output.scrollTop = output.scrollHeight;
     }
 }
 
-// Recherche dynamique dans le dossier d'aide / codes
 function filterCheatSheet() {
     const query = document.getElementById('searchCheat').value.toLowerCase();
-    const sections = document.querySelectorAll('.cheat-sheet-section');
-
-    sections.forEach(sec => {
-        const text = sec.innerText.toLowerCase();
-        if (text.includes(query)) {
-            sec.style.display = 'block';
-        } else {
-            sec.style.display = 'none';
-        }
+    document.querySelectorAll('.cheat-sheet-section').forEach(sec => {
+        sec.style.display = sec.innerText.toLowerCase().includes(query) ? 'block' : 'none';
     });
 }
