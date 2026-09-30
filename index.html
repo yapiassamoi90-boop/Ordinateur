@@ -6,68 +6,82 @@
 <meta name="theme-color" content="#0078d7">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
-<title>AsaMoi OS - Windows 11</title>
+<title>Assamoi OS - Windows 11</title>
 </head>
 <body>
+
+<div id="boot-screen">
+  <div class="boot-logo">⊞</div>
+  <div class="boot-dots"><span></span><span></span><span></span></div>
+  <p>Assamoi OS</p>
+  <small style="margin-top:8px;opacity:0.8">Ctrl+P = Ce PC • Ctrl+B = Navigateur</small>
+</div>
+
 <div id="desktop"><div id="folders-container"></div></div>
 
 <div id="win-explorer" class="window">
-  <div class="window-header"><span>📁 Explorateur</span><div><button onclick="minimizeWindow('win-explorer')">—</button><button onclick="closeWindow('win-explorer')">✕</button></div></div>
+  <div class="window-header"><span>📁 Ce PC - Assamoi OS</span><div><button onclick="closeWindow('win-explorer')">✕</button></div></div>
   <div class="window-body">
-    <div class="explorer-top"><span id="explorer-path" style="font-weight:bold;">Ce PC</span><button onclick="document.getElementById('fileImporter').click()" style="background:#0078d7;color:#fff;border:none;padding:6px 12px;border-radius:6px;">+ Importer</button><input type="file" id="fileImporter" hidden onchange="importFileToOS(event)"></div>
+    <div class="explorer-top"><span id="explorer-path">Ce PC</span><button onclick="document.getElementById('fileImporter').click()" style="background:#0078d7;color:#fff;border:none;padding:6px 12px;border-radius:6px;">+ Importer</button><input type="file" id="fileImporter" hidden onchange="importFileToOS(event)"></div>
     <div id="explorer-files-list"></div>
   </div>
 </div>
 
 <div id="win-browser" class="window">
-  <div class="window-header"><span>🌐 Navigateur</span><div><button onclick="closeWindow('win-browser')">✕</button></div></div>
-  <div class="window-body" style="padding:15px;background:#f5f5f5;overflow-y:auto;">
-    <div style="display:flex;gap:6px;margin-bottom:15px">
-      <input id="browser-url" type="text" value="" placeholder="Tape youtube.com, google.com..." style="flex:1;border-radius:20px;border:1px solid #ccc;padding:10px 15px">
-      <button onclick="browserGo()" style="background:#0078d7;color:#fff;border:none;border-radius:20px;padding:10px 18px;font-weight:bold">Go</button>
-    </div>
-    <div style="background:#fff;border-radius:12px;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1)">
-      <h3 style="margin-bottom:8px">🌐 Navigation Rapide</h3>
-      <p style="font-size:12px;color:#666;margin-bottom:12px">Astuce : Google bloque les fenêtres internes sur mobile. Ça s'ouvrira dans un nouvel onglet.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button onclick="window.open('https://www.google.com','_blank')" style="padding:12px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer">🔍 Google</button>
-        <button onclick="window.open('https://www.youtube.com','_blank')" style="padding:12px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer">▶️ YouTube</button>
-        <button onclick="window.open('https://fr.wikipedia.org','_blank')" style="padding:12px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer">📚 Wikipédia</button>
-        <button onclick="window.open('https://duckduckgo.com','_blank')" style="padding:12px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer">🦆 DuckDuckGo</button>
+  <div class="window-header"><span>🌐 Navigateur + Téléchargeur</span><div><button onclick="closeWindow('win-browser')">✕</button></div></div>
+  <div class="window-body" style="padding:12px;background:#f5f5f5;overflow-y:auto;">
+    <div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:12px;border:2px solid #16a34a">
+      <h4>⬇️ Télécharger dans Assamoi OS [Ctrl+D]</h4>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <input id="download-url" type="text" placeholder="Lien direct image/pdf/mp3" style="flex:1;padding:10px;border:1px solid #ccc;border-radius:20px">
+        <button onclick="downloadToAssamoi()" style="background:#16a34a;color:#fff;border:none;border-radius:20px;padding:10px 16px;font-weight:bold">DL</button>
       </div>
-      <div id="browser-preview" style="margin-top:15px;display:none">
-        <small style="color:#666">Aperçu (peut être bloqué) :</small>
-        <iframe id="browser-iframe" src="" style="width:100%;height:300px;border:1px solid #ccc;margin-top:8px;border-radius:8px;background:#fff"></iframe>
-      </div>
+      <div id="download-status" style="margin-top:8px;font-size:13px"></div>
     </div>
+    <div style="display:flex;gap:6px;margin-bottom:12px"><input id="browser-url" type="text" placeholder="google.com" style="flex:1;border-radius:20px;border:1px solid #ccc;padding:10px 15px"><button onclick="browserGo()" style="background:#0078d7;color:#fff;border:none;border-radius:20px;padding:10px 18px">Go</button></div>
+    <div style="background:#fff;border-radius:12px;padding:12px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button onclick="window.open('https://www.google.com','_blank')" style="padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff">🔍 Google</button><button onclick="window.open('https://www.youtube.com','_blank')" style="padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff">▶️ YouTube</button><button onclick="window.open('https://images.unsplash.com/photo-1557682224-33bb4a46bbde?w=400','_blank')" style="padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff">🖼️ Test Image</button><button onclick="window.open('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf','_blank')" style="padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff">📄 Test PDF</button></div><div id="browser-preview" style="display:none;margin-top:10px"><iframe id="browser-iframe" style="width:100%;height:250px;border:1px solid #ccc;border-radius:8px"></iframe></div></div>
   </div>
 </div>
 
-<div id="win-word" class="window">
-  <div class="window-header"><span>📝 WordPad</span><div><button onclick="closeWindow('win-word')">✕</button></div></div>
-  <div class="window-body" style="display:flex;flex-direction:column;height:calc(100% - 40px);padding:10px;">
-    <div style="margin-bottom:8px;display:flex;gap:6px"><button onclick="document.execCommand('bold',false,null)"><b>B</b></button><button onclick="document.execCommand('italic',false,null)"><i>I</i></button></div>
-    <div contenteditable="true" style="flex:1;border:1px solid #ccc;padding:12px;background:#fff;outline:none;overflow-y:auto;border-radius:6px">Rédige ton texte ici...</div>
-  </div>
-</div>
-
-<div id="win-help" class="window">
-  <div class="window-header"><span>❓ Aide & Codes</span><div><button onclick="closeWindow('win-help')">✕</button></div></div>
-  <div class="window-body" style="padding:12px"><input id="searchCheat" placeholder="Rechercher..." oninput="filterCheatSheet()" style="width:100%;padding:8px;margin-bottom:12px;border:1px solid #ccc;border-radius:6px;"><div class="cheat-sheet-section"><h3>CMD</h3><p><b>help</b> : liste</p><p><b>cls</b> : effacer</p><p><b>explorer</b> : Ce PC</p><p><b>chrome</b> : navigateur</p></div></div>
+<div id="win-store" class="window">
+  <div class="window-header"><span>🛒 Store Assamoi [Ctrl+S]</span><div><button onclick="closeWindow('win-store')">✕</button></div></div>
+  <div class="window-body" style="padding:15px;background:#f9f9f9"><div id="store-list" style="display:grid;gap:10px"></div></div>
 </div>
 
 <div id="win-cmd" class="window small">
-  <div class="window-header"><span>Invite de commandes</span><button onclick="closeWindow('win-cmd')">✕</button></div>
-  <div class="window-body cmd" style="background:#000;color:#0f0;font-family:monospace;padding:10px;overflow-y:auto;height:calc(100% - 40px);"><div id="cmd-output">Microsoft Windows [version 11.0]<br>(c) AsaMoi OS. Tapez 'help'<br><br></div><div style="display:flex"><span>C:\Users\Admin>&nbsp;</span><input id="cmd-input" onkeydown="handleCmd(event)" style="flex:1;background:transparent;border:none;color:#0f0;outline:none;font-family:monospace;"></div></div>
+  <div class="window-header"><span>⌨️ CMD Assamoi [Ctrl+C] - dir, mkdir, del, cls</span><button onclick="closeWindow('win-cmd')">✕</button></div>
+  <div class="window-body cmd" style="background:#0c0c0c;color:#0f0;font-family:Consolas,monospace;padding:10px;height:calc(100% - 42px);overflow-y:auto"><div id="cmd-output">Assamoi OS [Version 11.0]<br>(c) Assamoi. Tapez help<br><br></div><div style="display:flex"><span>C:\Assamoi>&nbsp;</span><input id="cmd-input" onkeydown="handleCmd(event)" style="flex:1;background:transparent;border:none;color:#0f0;outline:none;font-family:monospace"></div></div>
 </div>
 
-<div id="virtual-keyboard" style="display:none;position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);padding:10px;border-radius:10px;z-index:9999;gap:6px;width:92%;max-width:420px;justify-content:center;"><button onclick="sendKey('BACKSPACE')" style="padding:10px 14px;border:none;background:#333;color:#fff;border-radius:6px">⌫</button><button onclick="sendKey('Tab')" style="padding:10px 14px;border:none;background:#333;color:#fff;border-radius:6px">Tab</button><button onclick="sendKey(' ')" style="padding:10px 22px;border:none;background:#333;color:#fff;border-radius:6px">Espace</button></div>
+<div id="win-help" class="window">
+  <div class="window-header"><span>❓ Raccourcis - Aide</span><div><button onclick="closeWindow('win-help')">✕</button></div></div>
+  <div class="window-body" style="padding:14px;background:#fff">
+    <h4>Raccourcis Clavier</h4>
+    <div style="display:grid;gap:8px;margin-top:10px;font-size:14px">
+      <div><b>Ctrl+P</b> = Ce PC</div>
+      <div><b>Ctrl+B</b> = Navigateur</div>
+      <div><b>Ctrl+C</b> = Invite CMD</div>
+      <div><b>Ctrl+S</b> = Store Assamoi</div>
+      <div><b>Ctrl+D</b> = Téléchargeur</div>
+      <div><b>Ctrl+N</b> = Nouveau Dossier</div>
+      <div><b>Ctrl+L</b> = Effacer CMD</div>
+      <div><b>Alt+F4</b> = Fermer fenêtre</div>
+      <div><b>Ctrl+Shift+E</b> = Éteindre</div>
+      <hr>
+      <div><b>dir</b> = liste fichiers</div>
+      <div><b>mkdir nom</b> = créer dossier</div>
+      <div><b>del nom</b> = supprimer dossier</div>
+      <div><b>echo texte</b> = afficher</div>
+      <div><b>cls</b> = effacer écran</div>
+    </div>
+  </div>
+</div>
 
-<div id="taskbar"><div id="start-btn" onclick="toggleStartMenu()"><span>⊞</span> Démarrer</div><div class="task-icons"><div onclick="openWindow('win-explorer')">📁</div><div onclick="openWindow('win-browser')">🌐</div><div onclick="openWindow('win-word')">📝</div><div onclick="openWindow('win-cmd')">⌨️</div><div onclick="toggleVirtualKeyboard()">🎹</div></div><div id="clock">00:00:00</div></div>
+<div id="taskbar"><div id="start-btn" onclick="toggleStartMenu()"><span>⊞</span> Démarrer</div><div class="task-icons"><div onclick="openWindow('win-explorer')">📁</div><div onclick="openWindow('win-browser')">🌐</div><div onclick="openWindow('win-store')">🛒</div><div onclick="openWindow('win-cmd')">⌨️</div><div onclick="openWindow('win-help')">❓</div></div><div id="clock">00:00</div></div>
 
-<div id="start-menu" class="start-menu-hidden"><input id="startSearchInput" placeholder="Rechercher..." onkeydown="filterStartMenu(event)"><div class="start-apps"><div onclick="launchFromStart('win-explorer')">🖥️ Ce PC</div><div onclick="launchFromStart('win-browser')">🌐 Navigateur</div><div onclick="launchFromStart('win-word')">📝 WordPad</div><div onclick="launchFromStart('win-cmd')">⌨️ CMD</div><div onclick="launchFromStart('win-help')">❓ Aide</div></div><div class="start-footer"><div onclick="systemAction('shutdown')">⏻ Éteindre</div><div onclick="systemAction('restart')">🔄 Redémarrer</div></div></div>
+<div id="start-menu" class="start-menu-hidden"><div style="padding:6px;font-size:12px;color:#666">Raccourcis: Ctrl+P Ce PC | Ctrl+B Web | Ctrl+C CMD</div><div class="start-apps"><div onclick="launchFromStart('win-explorer')">🖥️ Ce PC [Ctrl+P]</div><div onclick="launchFromStart('win-browser')">🌐 Navigateur [Ctrl+B] + Téléchargeur [Ctrl+D]</div><div onclick="launchFromStart('win-store')">🛒 Store [Ctrl+S]</div><div onclick="launchFromStart('win-cmd')">⌨️ CMD [Ctrl+C] - dir mkdir</div><div onclick="launchFromStart('win-help')">❓ Liste des Raccourcis</div></div><div class="start-footer"><div onclick="systemAction('shutdown')">⏻ Éteindre [Ctrl+Shift+E]</div><div onclick="systemAction('restart')">🔄 Redémarrer</div></div></div>
 
-<div id="shutdown-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;flex-direction:column;justify-content:center;align-items:center;color:#fff;"><h1 style="font-size:60px;">💻</h1><p style="margin:20px 0;">PC éteint</p><button onclick="turnOnPC()" style="padding:12px 24px;background:#0078d7;color:#fff;border:none;border-radius:6px;">Allumer</button></div>
+<div id="shutdown-screen" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;flex-direction:column;justify-content:center;align-items:center;color:#fff;"><h1 style="font-size:70px;">⊞</h1><p style="margin:20px 0;font-size:18px">Assamoi OS éteint</p><button onclick="turnOnPC()" style="padding:14px 28px;background:#0078d7;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:bold">Allumer Assamoi OS</button><small style="margin-top:15px;opacity:0.6">Raccourci: Logo Windows au démarrage</small></div>
 
 <script src="app.js"></script>
 </body>
