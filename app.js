@@ -1,4 +1,3 @@
-
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(()=>{}); }
 const FILE_SYSTEM = {"Ce PC": {"Disque Local (C:)": {icon:"💾"}, "Disque Data (D:)": {icon:"🗄️"}, "Clé USB (E:)": {icon:"🔑"}}};
 let zIndexCounter=10, currentPath="Ce PC";
@@ -14,8 +13,20 @@ function closeStartMenu(){ document.getElementById('start-menu')?.classList.add(
 function launchFromStart(id){ openWindow(id); }
 function filterStartMenu(e){ if(e.key!=='Enter') return; const q=document.getElementById('startSearchInput').value.toLowerCase(); if(q.includes('cmd')) openWindow('win-cmd'); else if(q.includes('word')) openWindow('win-word'); else if(q.includes('chrome')||q.includes('navigateur')||q.includes('google')||q.includes('youtube')) openWindow('win-browser'); else if(q.includes('aide')||q.includes('code')) openWindow('win-help'); else openWindow('win-explorer'); }
 function renderExplorer(path="Ce PC"){ currentPath=path; const list=document.getElementById('explorer-files-list'); const bc=document.getElementById('explorer-path'); if(!list) return; if(bc) bc.innerText=path; list.innerHTML=""; if(path==="Ce PC"){ Object.entries(FILE_SYSTEM["Ce PC"]).forEach(([name,drive])=>{ list.innerHTML+=`<div class="drive-item" onclick="renderExplorer('${name}')" style="display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #eee;cursor:pointer;"><span style="font-size:30px">${drive.icon}</span><div><b>${name}</b><br><small style="color:#666">120 Go libre sur 250 Go</small><div style="background:#ddd;height:6px;width:140px;margin-top:5px;border-radius:3px"><div style="background:#0078d7;width:55%;height:100%;border-radius:3px"></div></div></div></div>`; }); return; } list.innerHTML=`<div onclick="renderExplorer('Ce PC')" style="cursor:pointer;color:#0078d7;margin-bottom:12px;font-weight:600;padding:10px">⬅️ Retour à Ce PC</div>`; userFolders.forEach(f=>{list.innerHTML+=`<div style="padding:8px 10px;">📁 ${f}</div>`;}); if(importedFiles.length===0){list.innerHTML+=`<p style="color:#777;margin:12px 10px;font-size:13px;">Aucun fichier dans ${path}. Clique sur + Importer.</p>`;} importedFiles.forEach((file,i)=>{list.innerHTML+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #f5f5f5;"><span>📄 ${file.name}</span><div><button onclick="openImportedFile(${i})" style="background:#0078d7;color:#fff;border:none;padding:5px 10px;border-radius:5px;margin-right:6px;">Ouvrir</button><button onclick="deleteImportedFile(${i})" style="background:#e81123;color:#fff;border:none;padding:5px 9px;border-radius:5px;">X</button></div></div>`;}); }
-function navigateTo(url){ const ifr=document.getElementById('browser-iframe'); const inp=document.getElementById('browser-url'); if(!url.startsWith('http')) url='https://'+url; ifr.src=url; if(inp) inp.value=url; }
-function browserGo(){ let url=document.getElementById('browser-url').value.trim(); if(!url) return; if(url.includes('google')) navigateTo('https://duckduckgo.com'); else if(url.includes('youtube')) navigateTo('https://www.youtube.com'); else navigateTo(url); }
+function navigateTo(url){
+  if(!url.startsWith('http')) url='https://'+url;
+  document.getElementById('browser-url').value=url;
+  const preview=document.getElementById('browser-preview');
+  const iframe=document.getElementById('browser-iframe');
+  if(preview) preview.style.display='block';
+  if(iframe) iframe.src=url;
+  setTimeout(()=>{ window.open(url,'_blank'); }, 700);
+}
+function browserGo(){
+  let url=document.getElementById('browser-url').value.trim();
+  if(!url) return;
+  navigateTo(url);
+}
 function renderFolders(){ const c=document.getElementById('folders-container'); if(!c) return; c.innerHTML=`<div class="icon" onclick="renderExplorer('Ce PC'); openWindow('win-explorer')"><span>🖥️</span><p>Ce PC</p></div><div class="icon" onclick="openWindow('win-browser')"><span>🌐</span><p>Chrome</p></div><div class="icon" onclick="openWindow('win-word')"><span>📝</span><p>WordPad</p></div><div class="icon" onclick="openWindow('win-cmd')"><span>⌨️</span><p>CMD</p></div><div class="icon" onclick="openWindow('win-help')"><span>❓</span><p>Aide</p></div>${userFolders.map(f=>`<div class="icon"><span>📁</span><p>${f}</p></div>`).join('')}${importedFiles.map((f,i)=>`<div class="icon" onclick="openImportedFile(${i})"><span>📄</span><p style="font-size:11px;overflow:hidden;white-space:nowrap;width:75px">${f.name}</p></div>`).join('')}`; }
 function importFileToOS(e){ const file=e.target.files[0]; if(!file) return; const r=new FileReader(); r.onload=ev=>{ importedFiles.push({name:file.name,size:(file.size/1024).toFixed(1)+' Ko',content:ev.target.result}); localStorage.setItem('asamoi_files',JSON.stringify(importedFiles)); renderFolders(); renderExplorer(currentPath); }; r.readAsDataURL(file); }
 function openImportedFile(i){ const f=importedFiles[i]; if(!f) return; const w=window.open('','_blank'); if(f.content.startsWith('data:image')){ w.document.write(`<img src="${f.content}" style="max-width:100%">`);} else { w.document.write(`<pre style="padding:20px">${f.name}</pre>`);} }
