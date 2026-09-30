@@ -1,1 +1,41 @@
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{overflow:hidden;height:100vh;background:#1a1a2e url('https://images.unsplash.com/photo-1557682224-33bb4a46bbde?w=1080') center/cover no-repeat}
+#desktop{width:100%;height:calc(100% - 52px);padding:15px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+.icon{width:85px;text-align:center;color:white;text-shadow:0 1px 4px #000;cursor:pointer;padding:8px;border-radius:6px;user-select:none}
+.icon:hover{background:rgba(255,255,255,0.18)}
+.icon:active{background:rgba(255,255,255,0.28)}
+.icon span{font-size:36px;display:block;line-height:1}
+.icon p{font-size:12px;margin-top:6px;word-break:break-word}
+.window{position:absolute;top:8%;left:3%;width:94%;max-width:600px;height:72%;background:#f3f3f3;border-radius:10px;box-shadow:0 15px 40px rgba(0,0,0,0.6);display:none;flex-direction:column;overflow:hidden;border:1px solid #bbb;touch-action:none}
+.window.active{display:flex;z-index:10}
+.window.small{height:50%;width:90%}
+.window-header{background:#e8e8e8;height:40px;display:flex;justify-content:space-between;align-items:center;padding:0 12px;font-weight:600;cursor:move;user-select:none;flex-shrink:0}
+.window-header div{display:flex;gap:2px}
+.window-header button{border:none;background:transparent;padding:6px 12px;cursor:pointer;border-radius:4px;font-size:14px}
+.window-header button:hover{background:#ddd}
+.window-header button:last-child:hover{background:#e81123;color:#fff}
+.window-body{flex:1;overflow:auto;background:#fff;position:relative}
+.explorer-top{display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #eee;background:#fafafa;gap:8px}
+.drive-item:hover{background:#e8f2ff}
+.drive-item{transition:0.15s}
+.file-item:hover{background:#f5f5f5}
+#taskbar{position:fixed;bottom:0;left:0;width:100%;height:52px;background:rgba(243,243,243,0.94);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:9999;border-top:1px solid #ddd}
+#start-btn{background:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2);font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px}
+.task-icons{display:flex;gap:14px;font-size:22px;align-items:center}
+.task-icons div{cursor:pointer;padding:4px 6px;border-radius:5px}
+.task-icons div:hover{background:rgba(0,0,0,0.08)}
+#clock{font-size:12px;font-weight:500;min-width:70px;text-align:right}
+#start-menu{position:fixed;bottom:62px;left:50%;transform:translateX(-50%);width:92%;max-width:380px;background:rgba(249,249,249,0.98);backdrop-filter:blur(20px);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.35);padding:12px;display:flex;flex-direction:column;z-index:10000;border:1px solid #ddd}
+.start-menu-hidden{display:none !important}
+#startSearchInput{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #ccc;background:#fff;margin-bottom:10px;outline:none}
+#startSearchInput:focus{border-color:#0078d7}
+.start-apps div{padding:11px 10px;border-radius:7px;cursor:pointer;display:flex;gap:10px;align-items:center;font-size:14px}
+.start-apps div:hover{background:#e9e9e9}
+.start-footer{border-top:1px solid #e0e0e0;margin-top:10px;padding-top:10px;display:flex;justify-content:space-around;font-size:13px}
+.start-footer div{padding:6px 12px;border-radius:6px;cursor:pointer;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.1)}
+.start-footer div:hover{background:#f0f0f0}
+.cmd{font-size:13px;line-height:1.5}
+#virtual-keyboard{flex-direction:row;align-items:center;flex-wrap:wrap}
+#virtual-keyboard button{border:none;background:#2d2d2d;color:#fff;border-radius:6px;font-size:13px;cursor:pointer}
+#virtual-keyboard button:active{background:#555}
+#shutdown-screen button:active{transform:scale(0.97)}
